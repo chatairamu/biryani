@@ -18,12 +18,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_coupon'])) {
     $code = trim(strtoupper($_POST['code']));
     $type = $_POST['type'];
     $value = trim($_POST['value']);
-    $expiry_date = !empty($_POST['expiry_date']) ? $_POST['expiry_date'] : null;
+    $start_date = !empty($_POST['start_date']) ? $_POST['start_date'] : null;
+    $end_date = !empty($_POST['end_date']) ? $_POST['end_date'] : null;
 
     if (!empty($code) && !empty($type) && is_numeric($value)) {
         try {
-            $stmt = $pdo->prepare("INSERT INTO coupons (code, type, value, expiry_date) VALUES (?, ?, ?, ?)");
-            $stmt->execute([$code, $type, $value, $expiry_date]);
+            $stmt = $pdo->prepare("INSERT INTO coupons (code, type, value, start_date, end_date) VALUES (?, ?, ?, ?, ?)");
+            $stmt->execute([$code, $type, $value, $start_date, $end_date]);
             $success_message = "Coupon '" . htmlspecialchars($code) . "' added successfully.";
         } catch (PDOException $e) {
             if ($e->errorInfo[1] == 1062) {
@@ -86,8 +87,12 @@ $coupons = $pdo->query("SELECT * FROM coupons ORDER BY created_at DESC")->fetchA
                         <input type="number" step="0.01" class="form-control" id="value" name="value" required>
                     </div>
                     <div class="mb-3">
-                        <label for="expiry_date" class="form-label">Expiry Date (Optional)</label>
-                        <input type="date" class="form-control" id="expiry_date" name="expiry_date">
+                        <label for="start_date" class="form-label">Start Date (Optional)</label>
+                        <input type="date" class="form-control" id="start_date" name="start_date">
+                    </div>
+                    <div class="mb-3">
+                        <label for="end_date" class="form-label">End Date (Optional)</label>
+                        <input type="date" class="form-control" id="end_date" name="end_date">
                     </div>
                     <button type="submit" name="add_coupon" class="btn btn-primary">Add Coupon</button>
                 </form>
@@ -104,7 +109,8 @@ $coupons = $pdo->query("SELECT * FROM coupons ORDER BY created_at DESC")->fetchA
                             <th>Code</th>
                             <th>Type</th>
                             <th>Value</th>
-                            <th>Expiry</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -120,7 +126,8 @@ $coupons = $pdo->query("SELECT * FROM coupons ORDER BY created_at DESC")->fetchA
                                         ₹<?php echo htmlspecialchars(number_format($coupon['value'], 2)); ?>
                                     <?php endif; ?>
                                 </td>
-                                <td><?php echo $coupon['expiry_date'] ? htmlspecialchars($coupon['expiry_date']) : 'N/A'; ?></td>
+                                <td><?php echo $coupon['start_date'] ? htmlspecialchars($coupon['start_date']) : 'N/A'; ?></td>
+                                <td><?php echo $coupon['end_date'] ? htmlspecialchars($coupon['end_date']) : 'N/A'; ?></td>
                                 <td>
                                     <form method="POST" action="" onsubmit="return confirm('Are you sure you want to delete this coupon?');">
                                         <input type="hidden" name="coupon_id" value="<?php echo $coupon['id']; ?>">

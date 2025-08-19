@@ -153,7 +153,73 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_review'])) {
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-// All JS from previous version of this file...
+$(document).ready(function() {
+    // This script is adapted from products.php for a single product page
+    function updatePrice() {
+        const card = $('.product-card');
+        let basePrice = parseFloat(card.data('base-price'));
+        let finalPrice = basePrice;
+        card.find('.variant-select').each(function() {
+            const adjustment = parseFloat($(this).find('option:selected').data('price-adjustment'));
+            finalPrice += adjustment;
+        });
+        card.find('.sale-price').text('₹' + finalPrice.toFixed(2));
+    }
+    $('.variant-select').on('change', updatePrice).trigger('change');
+
+    $('.add-to-cart-btn').on('click', function() {
+        const card = $(this).closest('.product-card');
+        const productId = card.data('product-id');
+        const selectedOptions = {};
+        card.find('.variant-select').each(function() {
+            const optionName = $(this).siblings('label').text().replace(':', '');
+            const optionValue = $(this).find('option:selected').text();
+            selectedOptions[optionName] = optionValue;
+        });
+        $.ajax({
+            url: 'add_to_cart.php',
+            method: 'POST',
+            data: { id: productId, quantity: 1, options: JSON.stringify(selectedOptions) },
+            dataType: 'json',
+            success: function(response) {
+                if(response.success) {
+                    alert('Product added to cart!');
+                    $('#cart-badge').text(response.total_items);
+                } else { alert(response.error || 'Could not add to cart.'); }
+            },
+            error: function(xhr) {
+                if (xhr.status == 401) {
+                    alert('Please log in to add items to your cart.');
+                    window.location.href = 'login.php?redirect=product_detail.php?id=' + productId;
+                } else { alert('An error occurred.'); }
+            }
+        });
+    });
+
+    $('.add-to-wishlist-btn').on('click', function() {
+        const productId = $(this).closest('.product-card').data('product-id');
+        $.ajax({
+            url: 'add_to_wishlist.php',
+            method: 'POST',
+            data: { product_id: productId },
+            dataType: 'json',
+            success: function(response) {
+                alert(response.message || 'Request completed.');
+            },
+            error: function(xhr) {
+                if (xhr.status == 401) {
+                    alert('Please log in to add items to your wishlist.');
+                    window.location.href = 'login.php?redirect=product_detail.php?id=' + productId;
+                } else { alert('An error occurred.'); }
+            }
+        });
+    });
+
+    function updateCartBadge() {
+        $.ajax({ url: 'update_cart_badge.php', method: 'GET', success: function(response) { $('#cart-badge').text(response); } });
+    }
+    updateCartBadge();
+});
 </script>
 
 <?php include 'includes/footer.php'; ?>

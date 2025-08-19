@@ -18,6 +18,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_tag'])) {
     $tag_id = filter_input(INPUT_POST, 'tag_id', FILTER_VALIDATE_INT);
     $name = trim($_POST['name']);
     $slug = trim($_POST['slug']);
+    $meta_title = trim($_POST['meta_title']);
+    $meta_description = trim($_POST['meta_description']);
 
     if (empty($name) || empty($slug)) {
         $errors[] = "Tag name and slug are required.";
@@ -25,13 +27,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_tag'])) {
         try {
             if ($tag_id) {
                 // Update existing tag
-                $stmt = $pdo->prepare("UPDATE tags SET name = ?, slug = ? WHERE id = ?");
-                $stmt->execute([$name, $slug, $tag_id]);
+                $stmt = $pdo->prepare("UPDATE tags SET name = ?, slug = ?, meta_title = ?, meta_description = ? WHERE id = ?");
+                $stmt->execute([$name, $slug, $meta_title, $meta_description, $tag_id]);
                 $success_message = "Tag updated successfully.";
             } else {
                 // Insert new tag
-                $stmt = $pdo->prepare("INSERT INTO tags (name, slug) VALUES (?, ?)");
-                $stmt->execute([$name, $slug]);
+                $stmt = $pdo->prepare("INSERT INTO tags (name, slug, meta_title, meta_description) VALUES (?, ?, ?, ?)");
+                $stmt->execute([$name, $slug, $meta_title, $meta_description]);
                 $success_message = "Tag added successfully.";
             }
         } catch (PDOException $e) {
@@ -99,6 +101,14 @@ if (isset($_GET['edit_id'])) {
                         <label for="slug" class="form-label">Slug</label>
                         <input type="text" class="form-control" id="slug" name="slug" value="<?php echo $tag_to_edit['slug'] ?? ''; ?>" required>
                         <small class="form-text text-muted">A unique, URL-friendly identifier (e.g., "best-seller").</small>
+                    </div>
+                    <div class="mb-3">
+                        <label for="meta_title" class="form-label">Meta Title</label>
+                        <input type="text" class="form-control" id="meta_title" name="meta_title" value="<?php echo $tag_to_edit['meta_title'] ?? ''; ?>">
+                    </div>
+                    <div class="mb-3">
+                        <label for="meta_description" class="form-label">Meta Description</label>
+                        <textarea class="form-control" id="meta_description" name="meta_description" rows="3"><?php echo $tag_to_edit['meta_description'] ?? ''; ?></textarea>
                     </div>
                     <button type="submit" name="save_tag" class="btn btn-primary"><?php echo $tag_to_edit ? 'Update' : 'Add'; ?> Tag</button>
                     <?php if ($tag_to_edit): ?>

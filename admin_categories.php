@@ -18,6 +18,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_category'])) {
     $category_id = filter_input(INPUT_POST, 'category_id', FILTER_VALIDATE_INT);
     $name = trim($_POST['name']);
     $slug = trim($_POST['slug']);
+    $meta_title = trim($_POST['meta_title']);
+    $meta_description = trim($_POST['meta_description']);
 
     if (empty($name) || empty($slug)) {
         $errors[] = "Category name and slug are required.";
@@ -25,13 +27,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_category'])) {
         try {
             if ($category_id) {
                 // Update existing category
-                $stmt = $pdo->prepare("UPDATE categories SET name = ?, slug = ? WHERE id = ?");
-                $stmt->execute([$name, $slug, $category_id]);
+                $stmt = $pdo->prepare("UPDATE categories SET name = ?, slug = ?, meta_title = ?, meta_description = ? WHERE id = ?");
+                $stmt->execute([$name, $slug, $meta_title, $meta_description, $category_id]);
                 $success_message = "Category updated successfully.";
             } else {
                 // Insert new category
-                $stmt = $pdo->prepare("INSERT INTO categories (name, slug) VALUES (?, ?)");
-                $stmt->execute([$name, $slug]);
+                $stmt = $pdo->prepare("INSERT INTO categories (name, slug, meta_title, meta_description) VALUES (?, ?, ?, ?)");
+                $stmt->execute([$name, $slug, $meta_title, $meta_description]);
                 $success_message = "Category added successfully.";
             }
         } catch (PDOException $e) {
@@ -100,6 +102,14 @@ if (isset($_GET['edit_id'])) {
                         <label for="slug" class="form-label">Slug</label>
                         <input type="text" class="form-control" id="slug" name="slug" value="<?php echo $category_to_edit['slug'] ?? ''; ?>" required>
                         <small class="form-text text-muted">A unique, URL-friendly identifier (e.g., "chicken-biryani").</small>
+                    </div>
+                    <div class="mb-3">
+                        <label for="meta_title" class="form-label">Meta Title</label>
+                        <input type="text" class="form-control" id="meta_title" name="meta_title" value="<?php echo $category_to_edit['meta_title'] ?? ''; ?>">
+                    </div>
+                    <div class="mb-3">
+                        <label for="meta_description" class="form-label">Meta Description</label>
+                        <textarea class="form-control" id="meta_description" name="meta_description" rows="3"><?php echo $category_to_edit['meta_description'] ?? ''; ?></textarea>
                     </div>
                     <button type="submit" name="save_category" class="btn btn-primary"><?php echo $category_to_edit ? 'Update' : 'Add'; ?> Category</button>
                     <?php if ($category_to_edit): ?>
