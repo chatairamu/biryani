@@ -51,7 +51,7 @@ if (!empty($categories)) {
 
 
 // --- Reviews Logic ---
-$reviews_stmt = $pdo->prepare("SELECT r.*, u.username FROM reviews r JOIN users u ON r.user_id = u.id WHERE r.product_id = ? ORDER BY r.created_at DESC");
+$reviews_stmt = $pdo->prepare("SELECT r.*, u.username FROM reviews r JOIN users u ON r.user_id = u.id WHERE r.product_id = ? AND r.is_approved = 1 ORDER BY r.created_at DESC");
 $reviews_stmt->execute([$product_id]);
 $reviews = $reviews_stmt->fetchAll();
 

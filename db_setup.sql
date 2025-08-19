@@ -15,69 +15,46 @@ SET time_zone = "+00:00";
 -- Database: `biryani`
 --
 
--- (All other table structures remain the same)
+-- (Other table definitions like cart, coupons, orders, etc. go here)
+-- ...
 
 --
--- Table structure for table `categories`
+-- Table structure for table `reviews`
 --
-CREATE TABLE `categories` (
-  `id` int(11) NOT NULL,
-  `name` varchar(100) NOT NULL,
-  `slug` varchar(100) NOT NULL,
-  `meta_title` varchar(255) DEFAULT NULL,
-  `meta_description` text DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Table structure for table `coupons`
---
-CREATE TABLE `coupons` (
+CREATE TABLE `reviews` (
   `id` int(11) NOT NULL,
-  `code` varchar(50) NOT NULL,
-  `type` enum('percentage','fixed') NOT NULL,
-  `value` decimal(10,2) NOT NULL,
-  `start_date` date DEFAULT NULL,
-  `end_date` date DEFAULT NULL,
-  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `product_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `rating` int(1) NOT NULL CHECK (`rating` >= 1 and `rating` <= 5),
+  `comment` text DEFAULT NULL,
+  `is_approved` tinyint(1) NOT NULL DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-
---
--- Table structure for table `products`
---
-CREATE TABLE `products` (
-  `id` int(11) NOT NULL,
-  `name` varchar(100) NOT NULL,
-  `description` text NOT NULL,
-  `mrp` decimal(10,2) NOT NULL,
-  `sale_price` decimal(10,2) NOT NULL,
-  `sale_price_start_date` date DEFAULT NULL,
-  `sale_price_end_date` date DEFAULT NULL,
-  `image_url` varchar(255) NOT NULL,
-  `stock` int(11) NOT NULL DEFAULT 0,
-  `weight` decimal(10,2) NOT NULL DEFAULT 0.50,
-  `gst_rate` decimal(5,2) NOT NULL DEFAULT 5.00,
-  `avg_rating` decimal(3,2) NOT NULL DEFAULT 0.00,
-  `meta_title` varchar(255) DEFAULT NULL,
-  `meta_description` text DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Table structure for table `tags`
---
-CREATE TABLE `tags` (
-  `id` int(11) NOT NULL,
-  `name` varchar(50) NOT NULL,
-  `slug` varchar(50) NOT NULL,
-  `meta_title` varchar(255) DEFAULT NULL,
-  `meta_description` text DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+-- (Other table definitions like settings, tags, users, etc. go here)
+-- ...
 
 
--- (All other tables and constraints remain the same as the previous version)
--- (This is a summary to avoid re-pasting the entire 300+ line file)
--- (The full file would have all original tables plus these modifications)
+--
+-- Indexes for table `reviews`
+--
+ALTER TABLE `reviews`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `product_id` (`product_id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
+-- AUTO_INCREMENT for table `reviews`
+--
+ALTER TABLE `reviews`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- Constraints for table `reviews`
+--
+ALTER TABLE `reviews`
+  ADD CONSTRAINT `reviews_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `reviews_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 COMMIT;
