@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remove_coupon'])) {
 
 // --- Fetch cart items ---
 $cart_stmt = $pdo->prepare(
-    "SELECT c.id as cart_item_id, p.id, p.name, p.sale_price, p.image_url, p.gst_rate, c.quantity, c.options
+    "SELECT c.id as cart_item_id, p.id, p.name, p.sale_price, p.image_url, p.gst_rate, p.stock, c.quantity, c.options
      FROM cart c
      JOIN products p ON c.product_id = p.id
      WHERE c.user_id = ?"
@@ -52,9 +52,10 @@ $cart_stmt = $pdo->prepare(
 $cart_stmt->execute([$user_id]);
 $cart_items = $cart_stmt->fetchAll();
 
-// --- Calculate Totals ---
+// --- Calculate Totals & Check Stock ---
 $subtotal = 0;
 $total_gst = 0;
+$checkout_disabled = false;
 foreach ($cart_items as &$item) {
     $item['options_array'] = json_decode($item['options'], true);
     $item_price = $item['sale_price'];
@@ -116,6 +117,12 @@ $grand_total = $subtotal_after_discount + $total_gst_after_discount; // Delivery
                                         <span class="mx-2 quantity"><?php echo $item['quantity']; ?></span>
                                         <button class="btn btn-outline-secondary btn-sm plus-btn">+</button>
                                     </div>
+                                    <?php if ($item['quantity'] > $item['stock']): ?>
+                                        <div class="text-danger mt-2">
+                                            <small><strong>Warning:</strong> Only <?php echo $item['stock']; ?> items in stock. Please reduce quantity.</small>
+                                            <?php $checkout_disabled = true; ?>
+                                        </div>
+                                    <?php endif; ?>
                                 </div>
                                 <div class="text-end">
                                     <p class="mb-0"><strong>₹<?php echo number_format($item['total_price'], 2); ?></strong></p>
@@ -156,7 +163,11 @@ $grand_total = $subtotal_after_discount + $total_gst_after_discount; // Delivery
                         <?php endif; ?>
                         <?php if ($coupon_message): ?><div class="alert alert-info mt-2 p-2"><?php echo $coupon_message; ?></div><?php endif; ?>
                         <?php if (!empty($errors)): ?><div class="alert alert-danger mt-2 p-2"><?php echo $errors[0]; ?></div><?php endif; ?>
-                        <div class="d-grid mt-3"><a href="checkout.php" class="btn btn-success">Proceed to Checkout</a></div>
+                        <div class="d-grid mt-3">
+                            <a href="checkout.php" class="btn btn-success <?php if ($checkout_disabled) echo 'disabled'; ?>">
+                                <?php echo $checkout_disabled ? 'Please Fix Stock Issues' : 'Proceed to Checkout'; ?>
+                            </a>
+                        </div>
                     </div>
                 </div>
             <?php endif; ?>
