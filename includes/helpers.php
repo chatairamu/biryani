@@ -49,3 +49,30 @@ function generate_pagination_links($current_page, $total_pages, $base_url, $para
     $html .= '</ul></nav>';
     return $html;
 }
+
+/**
+ * Generates and stores a CSRF token in the session.
+ * @return string The generated token.
+ */
+function generate_csrf_token() {
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+    return $_SESSION['csrf_token'];
+}
+
+/**
+ * Validates a submitted CSRF token against the one in the session.
+ * Dies with a 403 error if validation fails.
+ * @param string $submitted_token The token from the form submission.
+ */
+function validate_csrf_token($submitted_token) {
+    if (!isset($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $submitted_token)) {
+        // Token is invalid or doesn't exist.
+        http_response_code(403);
+        die('CSRF validation failed.');
+    }
+    // Note: The token is NOT unset after validation. This allows the same token
+    // to be used for multiple AJAX requests or forms on the same page.
+    // A new token will be generated on the next full page load.
+}
