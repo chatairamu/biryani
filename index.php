@@ -3,9 +3,7 @@ session_start();
 require_once 'includes/db_connection.php';
 
 // Fetch products for the sliders
-// For now, we'll use the same set of latest products for all sliders.
-// In a real application, you might have different logic for each (e.g., based on sales, views, etc.)
-$latest_products_stmt = $pdo->query("SELECT name, price, image_url as img FROM products ORDER BY created_at DESC LIMIT 8");
+$latest_products_stmt = $pdo->query("SELECT name, sale_price as price, image_url as img FROM products ORDER BY created_at DESC LIMIT 8");
 $latest_products = $latest_products_stmt->fetchAll();
 
 // We'll use the same data for all sliders for this example
