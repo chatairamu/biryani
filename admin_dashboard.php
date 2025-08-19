@@ -20,18 +20,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_product'])) {
     $sale_price = trim($_POST['sale_price']);
     $stock = trim($_POST['stock']);
     $weight = trim($_POST['weight']);
+    $gst_rate = trim($_POST['gst_rate']);
     $image_url = trim($_POST['image_url']);
 
-    if (empty($name) || empty($description) || empty($mrp) || empty($sale_price) || empty($stock) || empty($weight) || empty($image_url)) {
+    if (empty($name) || empty($description) || empty($mrp) || empty($sale_price) || empty($stock) || empty($weight) || empty($gst_rate) || empty($image_url)) {
         $errors[] = "All product fields are required.";
-    } elseif (!is_numeric($mrp) || !is_numeric($sale_price) || !is_numeric($stock) || !is_numeric($weight)) {
-        $errors[] = "MRP, Sale Price, Stock, and Weight must be numbers.";
+    } elseif (!is_numeric($mrp) || !is_numeric($sale_price) || !is_numeric($stock) || !is_numeric($weight) || !is_numeric($gst_rate)) {
+        $errors[] = "MRP, Sale Price, Stock, Weight, and GST Rate must be numbers.";
     } else {
         try {
             $stmt = $pdo->prepare(
-                "INSERT INTO products (name, description, mrp, sale_price, stock, weight, image_url) VALUES (?, ?, ?, ?, ?, ?, ?)"
+                "INSERT INTO products (name, description, mrp, sale_price, stock, weight, gst_rate, image_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
             );
-            $stmt->execute([$name, $description, $mrp, $sale_price, $stock, $weight, $image_url]);
+            $stmt->execute([$name, $description, $mrp, $sale_price, $stock, $weight, $gst_rate, $image_url]);
             $success_message = "Product added successfully!";
         } catch (PDOException $e) {
             $errors[] = "Database error: Could not add product. " . $e->getMessage();
@@ -117,14 +118,17 @@ $orders = $pdo->query(
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-6 mb-3">
+                    <div class="col-md-4 mb-3">
                         <label for="stock" class="form-label">Stock</label>
                         <input type="number" class="form-control" id="stock" name="stock" required>
                     </div>
-                    <div class="col-md-6 mb-3">
+                    <div class="col-md-4 mb-3">
                         <label for="weight" class="form-label">Weight (kg)</label>
                         <input type="number" step="0.01" class="form-control" id="weight" name="weight" required>
-                        <small class="form-text text-muted">Used for weight-based delivery calculations.</small>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="gst_rate" class="form-label">GST Rate (%)</label>
+                        <input type="number" step="0.01" class="form-control" id="gst_rate" name="gst_rate" required>
                     </div>
                 </div>
                 <div class="mb-3">
@@ -145,6 +149,7 @@ $orders = $pdo->query(
                     <th>Sale Price</th>
                     <th>Stock</th>
                     <th>Weight (kg)</th>
+                    <th>GST (%)</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -157,6 +162,7 @@ $orders = $pdo->query(
                         <td>₹<?php echo htmlspecialchars(number_format($product['sale_price'], 2)); ?></td>
                         <td><?php echo htmlspecialchars($product['stock']); ?></td>
                         <td><?php echo htmlspecialchars($product['weight']); ?></td>
+                        <td><?php echo htmlspecialchars($product['gst_rate']); ?>%</td>
                         <td><a href="admin_product_variants.php?product_id=<?php echo $product['id']; ?>" class="btn btn-sm btn-warning">Edit Variants</a></td>
                     </tr>
                 <?php endforeach; ?>
@@ -178,8 +184,20 @@ $orders = $pdo->query(
                         <td><?php echo htmlspecialchars($order['username']); ?></td>
                         <td><?php echo htmlspecialchars(date("F j, Y, g:i a", strtotime($order['created_at']))); ?></td>
                         <td>₹<?php echo htmlspecialchars(number_format($order['total_amount'], 2)); ?></td>
-                        <td><?php echo htmlspecialchars($order['status']); ?></td>
-                        <td><a href="#" class="btn btn-sm btn-info">Details</a></td>
+                        <td>
+                            <form method="POST" action="admin_update_order_status.php" class="d-flex">
+                                <input type="hidden" name="order_id" value="<?php echo $order['id']; ?>">
+                                <select name="status" class="form-select form-select-sm">
+                                    <?php foreach (['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'] as $status): ?>
+                                        <option value="<?php echo $status; ?>" <?php echo $order['status'] === $status ? 'selected' : ''; ?>>
+                                            <?php echo $status; ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <button type="submit" class="btn btn-sm btn-primary ms-2">Save</button>
+                            </form>
+                        </td>
+                        <td><a href="admin_order_details.php?order_id=<?php echo $order['id']; ?>" class="btn btn-sm btn-info">Details</a></td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>

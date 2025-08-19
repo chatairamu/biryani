@@ -25,7 +25,7 @@ $settings_stmt = $pdo->query("SELECT setting_key, setting_value FROM settings");
 $settings = $settings_stmt->fetchAll(PDO::FETCH_KEY_PAIR);
 
 $cart_items_stmt = $pdo->prepare(
-    "SELECT p.name, p.sale_price, p.weight, c.quantity, c.options
+    "SELECT p.name, p.sale_price, p.weight, p.gst_rate, c.quantity, c.options
      FROM cart c JOIN products p ON c.product_id = p.id
      WHERE c.user_id = ?"
 );
@@ -35,10 +35,13 @@ $cart_items = $cart_items_stmt->fetchAll();
 // --- Calculations ---
 $subtotal = 0;
 $total_weight = 0;
+$total_gst = 0;
 foreach ($cart_items as $item) {
     // This calculation should be more robust in a real app, fetching variant prices
-    $subtotal += $item['sale_price'] * $item['quantity'];
+    $item_total_price = $item['sale_price'] * $item['quantity'];
+    $subtotal += $item_total_price;
     $total_weight += $item['weight'] * $item['quantity'];
+    $total_gst += $item_total_price * ($item['gst_rate'] / 100);
 }
 
 $discount_amount = 0;
@@ -54,8 +57,7 @@ if ($coupon_code) {
 }
 
 $subtotal_after_discount = $subtotal - $discount_amount;
-$gst_rate = floatval($settings['gst_rate'] ?? 5);
-$gst_amount = $subtotal_after_discount * ($gst_rate / 100);
+$gst_amount = ($total_gst / $subtotal) * $subtotal_after_discount; // Prorate GST after discount
 
 $delivery_charge = 0;
 $min_order_free_delivery = floatval($settings['min_order_for_free_delivery'] ?? 0);
@@ -118,7 +120,7 @@ $_SESSION['final_order_details'] = compact('subtotal', 'discount_amount', 'coupo
                         <?php if ($discount_amount > 0): ?>
                         <li class="list-group-item d-flex justify-content-between text-success"><span>Discount (<?php echo htmlspecialchars($coupon_code);?>)</span> <span>- ₹<?php echo number_format($discount_amount, 2); ?></span></li>
                         <?php endif; ?>
-                        <li class="list-group-item d-flex justify-content-between"><span>GST (<?php echo $gst_rate; ?>%)</span> <span>+ ₹<?php echo number_format($gst_amount, 2); ?></span></li>
+                        <li class="list-group-item d-flex justify-content-between"><span>GST (Calculated)</span> <span>+ ₹<?php echo number_format($gst_amount, 2); ?></span></li>
                         <li class="list-group-item d-flex justify-content-between"><span>Delivery Charge</span> <span>+ ₹<?php echo number_format($delivery_charge, 2); ?></span></li>
                         <li class="list-group-item d-flex justify-content-between h5"><strong>Total</strong> <strong>₹<?php echo number_format($grand_total, 2); ?></strong></li>
                     </ul>

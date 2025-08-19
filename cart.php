@@ -17,7 +17,6 @@ $discount_amount = 0;
 // --- Fetch Settings ---
 $settings_stmt = $pdo->query("SELECT setting_key, setting_value FROM settings");
 $settings = $settings_stmt->fetchAll(PDO::FETCH_KEY_PAIR);
-$gst_rate = floatval($settings['gst_rate'] ?? 5);
 
 // --- Handle Coupon Application ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apply_coupon'])) {
@@ -45,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remove_coupon'])) {
 
 // --- Fetch cart items ---
 $cart_stmt = $pdo->prepare(
-    "SELECT c.id as cart_item_id, p.id, p.name, p.sale_price, p.image_url, c.quantity, c.options
+    "SELECT c.id as cart_item_id, p.id, p.name, p.sale_price, p.image_url, p.gst_rate, c.quantity, c.options
      FROM cart c
      JOIN products p ON c.product_id = p.id
      WHERE c.user_id = ?"
@@ -55,13 +54,15 @@ $cart_items = $cart_stmt->fetchAll();
 
 // --- Calculate Totals ---
 $subtotal = 0;
+$total_gst = 0;
 foreach ($cart_items as &$item) {
     $item['options_array'] = json_decode($item['options'], true);
     $item_price = $item['sale_price'];
-    // In a real app, you would fetch and add price adjustments from options here.
-    // For simplicity, we'll assume the price is fixed for now.
+    // TODO: Add variant price adjustments here in a real scenario
     $item['total_price'] = $item_price * $item['quantity'];
+    $item['gst_amount'] = $item['total_price'] * ($item['gst_rate'] / 100);
     $subtotal += $item['total_price'];
+    $total_gst += $item['gst_amount'];
 }
 unset($item); // Unset reference
 
@@ -81,9 +82,11 @@ if (!empty($coupon_code)) {
     }
 }
 
-$gst_amount = ($subtotal - $discount_amount) * ($gst_rate / 100);
-$grand_total = ($subtotal - $discount_amount) + $gst_amount; // Delivery charge will be added at checkout
-
+$subtotal_after_discount = $subtotal - $discount_amount;
+// Note: GST is calculated on the subtotal *before* discount in many regions.
+// Here we calculate it after discount for simplicity. This can be changed.
+$total_gst_after_discount = $subtotal_after_discount / $subtotal * $total_gst;
+$grand_total = $subtotal_after_discount + $total_gst_after_discount; // Delivery charge will be added at checkout
 ?>
 
 <?php include 'includes/header.php'; ?>
@@ -137,7 +140,7 @@ $grand_total = ($subtotal - $discount_amount) + $gst_amount; // Delivery charge 
                                     <span>- ₹<?php echo number_format($discount_amount, 2); ?></span>
                                 </li>
                             <?php endif; ?>
-                            <li class="list-group-item d-flex justify-content-between"><span>GST (<?php echo $gst_rate; ?>%)</span><span>₹<?php echo number_format($gst_amount, 2); ?></span></li>
+                            <li class="list-group-item d-flex justify-content-between"><span>GST (Calculated)</span><span>₹<?php echo number_format($total_gst_after_discount, 2); ?></span></li>
                             <li class="list-group-item d-flex justify-content-between"><strong>Grand Total</strong><strong>₹<?php echo number_format($grand_total, 2); ?></strong></li>
                         </ul>
                         <hr>

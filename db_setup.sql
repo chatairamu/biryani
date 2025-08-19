@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 23, 2024 at 09:57 AM
+-- Generation Time: Jul 23, 2024 at 10:30 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -41,7 +41,8 @@ CREATE TABLE `coupons` (
   `type` enum('percentage','fixed') NOT NULL,
   `value` decimal(10,2) NOT NULL,
   `expiry_date` date DEFAULT NULL,
-  `is_active` tinyint(1) NOT NULL DEFAULT 1
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -54,7 +55,7 @@ CREATE TABLE `orders` (
   `id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `total_amount` decimal(10,2) NOT NULL,
-  `status` varchar(50) NOT NULL DEFAULT 'Pending',
+  `status` enum('Pending','Processing','Shipped','Delivered','Cancelled') NOT NULL DEFAULT 'Pending',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `shipping_address` text DEFAULT NULL,
   `gst_amount` decimal(10,2) DEFAULT 0.00,
@@ -81,6 +82,18 @@ CREATE TABLE `order_items` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `password_resets`
+--
+
+CREATE TABLE `password_resets` (
+  `email` varchar(100) NOT NULL,
+  `token` varchar(255) NOT NULL,
+  `expires_at` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `products`
 --
 
@@ -93,6 +106,7 @@ CREATE TABLE `products` (
   `image_url` varchar(255) NOT NULL,
   `stock` int(11) NOT NULL DEFAULT 0,
   `weight` decimal(10,2) NOT NULL DEFAULT 0.50,
+  `gst_rate` decimal(5,2) NOT NULL DEFAULT 5.00,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -100,11 +114,11 @@ CREATE TABLE `products` (
 -- Dumping data for table `products`
 --
 
-INSERT INTO `products` (`id`, `name`, `description`, `mrp`, `sale_price`, `image_url`, `stock`, `weight`, `created_at`) VALUES
-(1, 'Hyderabadi Chicken Biryani', 'Authentic Hyderabadi style chicken biryani with fragrant basmati rice and succulent chicken pieces.', 300.00, 250.00, 'https://picsum.photos/seed/chicken_biryani/400/300', 100, 0.75, '2024-07-23 07:44:59'),
-(2, 'Mutton Dum Biryani', 'Slow-cooked mutton biryani with rich flavors and aromatic spices.', 400.00, 350.00, 'https://picsum.photos/seed/mutton_biryani/400/300', 50, 0.80, '2024-07-23 07:44:59'),
-(3, 'Special Vegetable Biryani', 'A medley of fresh vegetables and paneer cooked with basmati rice.', 250.00, 200.00, 'https://picsum.photos/seed/veg_biryani/400/300', 120, 0.70, '2024-07-23 07:44:59'),
-(4, 'Tandoori Chicken Kebab', '6 pieces of spicy and succulent chicken kebabs, marinated in yogurt and spices.', 220.00, 180.00, 'https://picsum.photos/seed/chicken_kebab/400/300', 80, 0.40, '2024-07-23 07:44:59');
+INSERT INTO `products` (`id`, `name`, `description`, `mrp`, `sale_price`, `image_url`, `stock`, `weight`, `gst_rate`, `created_at`) VALUES
+(1, 'Hyderabadi Chicken Biryani', 'Authentic Hyderabadi style chicken biryani with fragrant basmati rice and succulent chicken pieces.', 300.00, 250.00, 'https://picsum.photos/seed/chicken_biryani/400/300', 100, 0.75, 5.00, '2024-07-23 07:44:59'),
+(2, 'Mutton Dum Biryani', 'Slow-cooked mutton biryani with rich flavors and aromatic spices.', 400.00, 350.00, 'https://picsum.photos/seed/mutton_biryani/400/300', 50, 0.80, 5.00, '2024-07-23 07:44:59'),
+(3, 'Special Vegetable Biryani', 'A medley of fresh vegetables and paneer cooked with basmati rice.', 250.00, 200.00, 'https://picsum.photos/seed/veg_biryani/400/300', 120, 0.70, 5.00, '2024-07-23 07:44:59'),
+(4, 'Tandoori Chicken Kebab', '6 pieces of spicy and succulent chicken kebabs, marinated in yogurt and spices.', 220.00, 180.00, 'https://picsum.photos/seed/chicken_kebab/400/300', 80, 0.40, 12.00, '2024-07-23 07:44:59');
 
 -- --------------------------------------------------------
 
@@ -199,6 +213,18 @@ CREATE TABLE `users` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `wishlist`
+--
+
+CREATE TABLE `wishlist` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `product_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 --
 -- Indexes for dumped tables
 --
@@ -234,6 +260,12 @@ ALTER TABLE `order_items`
   ADD KEY `product_id` (`product_id`);
 
 --
+-- Indexes for table `password_resets`
+--
+ALTER TABLE `password_resets`
+  ADD PRIMARY KEY (`email`);
+
+--
 -- Indexes for table `products`
 --
 ALTER TABLE `products`
@@ -266,6 +298,14 @@ ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `username` (`username`),
   ADD UNIQUE KEY `email` (`email`);
+
+--
+-- Indexes for table `wishlist`
+--
+ALTER TABLE `wishlist`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `user_product_unique` (`user_id`,`product_id`),
+  ADD KEY `product_id` (`product_id`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -320,6 +360,12 @@ ALTER TABLE `users`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `wishlist`
+--
+ALTER TABLE `wishlist`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- Constraints for dumped tables
 --
 
@@ -353,4 +399,11 @@ ALTER TABLE `product_options`
 --
 ALTER TABLE `product_option_values`
   ADD CONSTRAINT `product_option_values_ibfk_1` FOREIGN KEY (`option_id`) REFERENCES `product_options` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `wishlist`
+--
+ALTER TABLE `wishlist`
+  ADD CONSTRAINT `wishlist_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `wishlist_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE;
 COMMIT;

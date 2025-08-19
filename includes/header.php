@@ -111,6 +111,7 @@
               <li class="list-group-item"><a href="products.php" class="text-decoration-none">Products</a></li>
               <li class="list-group-item"><a href="cart.php" class="text-decoration-none">My Cart</a></li>
               <?php if (isset($_SESSION['user_id'])): ?>
+                  <li class="list-group-item"><a href="wishlist.php" class="text-decoration-none">My Wishlist</a></li>
                   <li class="list-group-item"><a href="dashboard.php" class="text-decoration-none">My Dashboard</a></li>
                   <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
                       <li class="list-group-item"><a href="admin_dashboard.php" class="text-decoration-none">Admin Dashboard</a></li>

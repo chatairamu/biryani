@@ -72,6 +72,11 @@ if (isset($_SESSION['user_id'])) {
 
                     <div class="d-flex align-items-center mt-auto">
                         <button class="btn btn-primary add-to-cart-btn">Add to Cart</button>
+                        <button class="btn btn-outline-danger ms-2 add-to-wishlist-btn" title="Add to Wishlist">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
+                                <path d="m8 2.748-.717-.737C5.6.271 2.216 1.333 1.053 3.468 0 5.4-1.5 7.822 8 12.502 17.5 7.822 16 5.4 14.947 3.468c-1.163-2.135-4.547-3.2-6.23-2.73L8 2.748zM8 15C-7.333 4.868 3.279-2.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-2.042 23.333 4.867 8 15z"/>
+                            </svg>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -147,6 +152,34 @@ $(document).ready(function() {
             }
         });
     }
+    // Add to wishlist button click
+    $('.add-to-wishlist-btn').on('click', function() {
+        const card = $(this).closest('.product-card');
+        const productId = card.data('product-id');
+
+        $.ajax({
+            url: 'add_to_wishlist.php',
+            method: 'POST',
+            data: { product_id: productId },
+            dataType: 'json',
+            success: function(response) {
+                if(response.success) {
+                    alert(response.message);
+                } else {
+                    alert(response.error || 'Could not add to wishlist.');
+                }
+            },
+            error: function(xhr) {
+                if (xhr.status == 401) {
+                    alert('Please log in to add items to your wishlist.');
+                    window.location.href = 'login.php?redirect=products.php';
+                } else {
+                    alert('An error occurred while adding to wishlist.');
+                }
+            }
+        });
+    });
+
     // Initial load
     updateCartBadge();
 });
