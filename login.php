@@ -13,7 +13,18 @@ if (isset($_SESSION['user_id'])) {
 }
 
 $error = '';
+$info_message = '';
 $username = '';
+
+// Check for redirection messages
+if (isset($_GET['redirect'])) {
+    if ($_GET['redirect'] === 'cart.php') {
+        $info_message = 'You need to be logged in to view your cart.';
+    } elseif ($_GET['redirect'] === 'checkout.php') {
+        $info_message = 'Please log in or create an account to proceed to checkout.';
+    }
+}
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username']);
@@ -54,6 +65,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <h1>Login</h1>
 
+<?php if (!empty($info_message)): ?>
+    <div class="alert alert-info"><?php echo htmlspecialchars($info_message); ?></div>
+<?php endif; ?>
 <?php if (!empty($error)): ?>
     <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
 <?php endif; ?>

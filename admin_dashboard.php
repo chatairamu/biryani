@@ -16,21 +16,25 @@ $success_message = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_product'])) {
     $name = trim($_POST['name']);
     $description = trim($_POST['description']);
-    $price = trim($_POST['price']);
+    $mrp = trim($_POST['mrp']);
+    $sale_price = trim($_POST['sale_price']);
     $stock = trim($_POST['stock']);
+    $weight = trim($_POST['weight']);
     $image_url = trim($_POST['image_url']);
 
-    if (empty($name) || empty($description) || empty($price) || empty($stock) || empty($image_url)) {
+    if (empty($name) || empty($description) || empty($mrp) || empty($sale_price) || empty($stock) || empty($weight) || empty($image_url)) {
         $errors[] = "All product fields are required.";
-    } elseif (!is_numeric($price) || !is_numeric($stock)) {
-        $errors[] = "Price and stock must be numbers.";
+    } elseif (!is_numeric($mrp) || !is_numeric($sale_price) || !is_numeric($stock) || !is_numeric($weight)) {
+        $errors[] = "MRP, Sale Price, Stock, and Weight must be numbers.";
     } else {
         try {
-            $stmt = $pdo->prepare("INSERT INTO products (name, description, price, stock, image_url) VALUES (?, ?, ?, ?, ?)");
-            $stmt->execute([$name, $description, $price, $stock, $image_url]);
+            $stmt = $pdo->prepare(
+                "INSERT INTO products (name, description, mrp, sale_price, stock, weight, image_url) VALUES (?, ?, ?, ?, ?, ?, ?)"
+            );
+            $stmt->execute([$name, $description, $mrp, $sale_price, $stock, $weight, $image_url]);
             $success_message = "Product added successfully!";
         } catch (PDOException $e) {
-            $errors[] = "Database error: Could not add product.";
+            $errors[] = "Database error: Could not add product. " . $e->getMessage();
         }
     }
 }
@@ -50,7 +54,15 @@ $orders = $pdo->query(
 <?php include 'includes/header.php'; ?>
 
 <h1>Admin Dashboard</h1>
-<p>Welcome, Admin! Manage your store from here.</p>
+<div class="d-flex justify-content-between align-items-center">
+    <p class="mb-0">Welcome, Admin! Manage your store from here.</p>
+    <div>
+        <a href="admin_coupons.php" class="btn btn-info">Manage Coupons</a>
+        <a href="admin_settings.php" class="btn btn-primary">Store Settings →</a>
+    </div>
+</div>
+
+<hr>
 
 <!-- Nav tabs -->
 <ul class="nav nav-tabs" id="adminTab" role="tablist">
@@ -93,18 +105,31 @@ $orders = $pdo->query(
                     <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
                 </div>
                 <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <label for="price" class="form-label">Price (₹)</label>
-                        <input type="number" step="0.01" class="form-control" id="price" name="price" required>
+                    <div class="col-md-6 mb-3">
+                        <label for="mrp" class="form-label">MRP (₹)</label>
+                        <input type="number" step="0.01" class="form-control" id="mrp" name="mrp" required>
+                        <small class="form-text text-muted">Maximum Retail Price (original price).</small>
                     </div>
-                    <div class="col-md-4 mb-3">
+                    <div class="col-md-6 mb-3">
+                        <label for="sale_price" class="form-label">Sale Price (₹)</label>
+                        <input type="number" step="0.01" class="form-control" id="sale_price" name="sale_price" required>
+                        <small class="form-text text-muted">The price at which the product will be sold.</small>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
                         <label for="stock" class="form-label">Stock</label>
                         <input type="number" class="form-control" id="stock" name="stock" required>
                     </div>
-                    <div class="col-md-4 mb-3">
-                        <label for="image_url" class="form-label">Image URL</label>
-                        <input type="text" class="form-control" id="image_url" name="image_url" required>
+                    <div class="col-md-6 mb-3">
+                        <label for="weight" class="form-label">Weight (kg)</label>
+                        <input type="number" step="0.01" class="form-control" id="weight" name="weight" required>
+                        <small class="form-text text-muted">Used for weight-based delivery calculations.</small>
                     </div>
+                </div>
+                <div class="mb-3">
+                    <label for="image_url" class="form-label">Image URL</label>
+                    <input type="text" class="form-control" id="image_url" name="image_url" required>
                 </div>
                 <button type="submit" name="add_product" class="btn btn-primary">Add Product</button>
             </form>
@@ -113,16 +138,26 @@ $orders = $pdo->query(
         <h2>Existing Products</h2>
         <table class="table table-striped">
             <thead>
-                <tr><th>ID</th><th>Name</th><th>Price</th><th>Stock</th><th>Actions</th></tr>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>MRP</th>
+                    <th>Sale Price</th>
+                    <th>Stock</th>
+                    <th>Weight (kg)</th>
+                    <th>Actions</th>
+                </tr>
             </thead>
             <tbody>
                 <?php foreach ($products as $product): ?>
                     <tr>
                         <td><?php echo htmlspecialchars($product['id']); ?></td>
                         <td><?php echo htmlspecialchars($product['name']); ?></td>
-                        <td>₹<?php echo htmlspecialchars(number_format($product['price'], 2)); ?></td>
+                        <td>₹<?php echo htmlspecialchars(number_format($product['mrp'], 2)); ?></td>
+                        <td>₹<?php echo htmlspecialchars(number_format($product['sale_price'], 2)); ?></td>
                         <td><?php echo htmlspecialchars($product['stock']); ?></td>
-                        <td><a href="#" class="btn btn-sm btn-warning">Edit</a></td>
+                        <td><?php echo htmlspecialchars($product['weight']); ?></td>
+                        <td><a href="admin_product_variants.php?product_id=<?php echo $product['id']; ?>" class="btn btn-sm btn-warning">Edit Variants</a></td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>
