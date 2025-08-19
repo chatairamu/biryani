@@ -1,63 +1,58 @@
 # Future Improvements and Production-Ready Features
 
-This document lists suggested features and improvements to make this e-commerce application more robust, user-friendly, and ready for a live production environment.
+This document lists suggested features and improvements to make this e-commerce application more robust, user-friendly, and ready for a live production environment. Many foundational features have been built, and this list represents the next logical steps.
 
-## 1. Core E-commerce Features
+## 1. Core E-commerce Enhancements
 
 - **Payment Gateway Integration:**
-  - Integrate a real payment gateway like Stripe, Razorpay, or PayPal to handle online payments securely instead of just "Cash on Delivery".
+  - Integrate a real payment gateway like Stripe, Razorpay, or PayPal to handle secure online payments. This is the highest priority for a live store.
 
-- **User Reviews and Ratings:**
-  - Allow logged-in users who have purchased a product to leave a star rating and a written review.
-  - Display average ratings on product pages and sort products by rating.
+- **Advanced Search & Filtering:**
+  - On the search and product listing pages, add advanced filtering options, such as filtering by price range, average rating, or specific tags.
 
-- **Search Functionality:**
-  - Implement a proper search feature (`search.php`) that queries the database for products based on name and description.
+- **Product-Level SEO:**
+  - Add fields for SEO meta titles and descriptions to products, categories, and tags to improve search engine visibility.
 
-- **Related Products:**
-  - On a product detail page, show a section for "You might also like" featuring related products (e.g., based on category or purchase history).
+- **Sale & Campaign Scheduling:**
+  - Add start and end dates to coupon codes.
+  - Create a system for scheduling sales (e.g., setting a future start/end date for a product's sale price).
 
-## 2. User Account and Experience
+## 2. User Experience and Account Features
 
-- **Password Reset:**
-  - Implement a "Forgot Password" feature that allows users to reset their password securely via an email link.
+- **Guest Checkout:**
+  - Allow users to check out without creating an account, which can significantly increase conversion rates.
 
-- **Order Tracking:**
-  - Expand the order status system (e.g., 'Processing', 'Shipped', 'Delivered', 'Cancelled').
-  - Allow users to view a detailed history and track the status of their orders.
+- **Social Logins:**
+  - Allow users to sign up or log in using social media accounts like Google or Facebook.
 
-- **Wishlist / Favorites:**
-  - Allow users to save products to a wishlist for future purchase.
+- **Order Modification/Cancellation:**
+  - Allow users to request a cancellation for an order that is still in the 'Pending' or 'Processing' state.
 
 ## 3. Admin and Store Management
 
-- **Advanced Inventory Management:**
-  - Add low-stock alerts for admins.
-  - Prevent checkout if an item's stock runs out while it's in the user's cart (currently only checked at the moment of order processing).
-
-- **Automated Email Notifications:**
-  - Send automated emails to customers for events like:
-    - Account registration confirmation.
-    - Order confirmation.
-    - Shipping and delivery updates.
-  - This would require setting up an email sending service (e.g., SendGrid, Mailgun) or using a local mail server.
-
 - **Advanced Admin Dashboard Analytics:**
-  - Add charts and stats to the admin dashboard showing sales trends, top-selling products, and new user registrations over time.
+  - Implement visual charts (using a library like Chart.js) for the statistics on the admin dashboard to make trends easier to spot.
 
-- **Product Categories:**
-  - Implement a full category management system so products can be organized and filtered by category.
+- **Review Management:**
+  - Create a new section in the admin panel where admins can approve, edit, or delete user-submitted reviews before they appear on the site.
 
-## 4. Technical and Security Enhancements
+- **Configurable Settings:**
+  - Move hardcoded values, such as the low-stock alert threshold (currently 10), into the "Store Settings" page to make them easily configurable by the admin.
+
+- **Pagination:**
+  - Add pagination to all tables in the admin dashboard (Products, Orders, Users) and to the main user-facing product list to improve performance and usability as the store grows.
+
+## 4. Technical and Architectural Improvements
+
+- **Email Sending Integration:**
+  - Complete the "Forgot Password" feature by integrating a real email sending service (e.g., PHPMailer with an SMTP provider like SendGrid or Mailgun).
+  - Use this service to send automated order confirmation and status update emails to customers.
 
 - **Environment-specific Configuration:**
-  - Separate development and production configurations (e.g., using a `.env` file) to keep sensitive credentials out of version control.
+  - Move sensitive credentials (like database passwords and API keys) out of the main `config.php` file and into a `.env` file that is not committed to version control. This is a critical security best practice.
 
 - **CSRF Protection:**
-  - Add Cross-Site Request Forgery (CSRF) tokens to all forms to enhance security.
+  - Implement Cross-Site Request Forgery (CSRF) tokens on all forms to prevent malicious attacks.
 
-- **API for Frontend:**
-  - For a more modern and scalable approach, refactor the backend to be a RESTful API that the frontend can consume via JavaScript. This decouples the frontend and backend.
-
-- **Comprehensive Logging:**
-  - Implement a robust logging system (e.g., using Monolog) to log errors, user actions, and important system events for easier debugging and auditing.
+- **API-driven Frontend:**
+  - For a more modern and scalable application, refactor the backend to function as a RESTful API. The frontend could then be rebuilt using a JavaScript framework (like Vue.js or React) that consumes this API. This provides a clear separation of concerns and a better user experience.
