@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 23, 2024 at 10:30 AM
+-- Generation Time: Jul 23, 2024 at 11:00 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -28,6 +28,27 @@ CREATE TABLE `cart` (
   `quantity` int(11) NOT NULL,
   `options` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `categories`
+--
+
+CREATE TABLE `categories` (
+  `id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `slug` varchar(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `categories`
+--
+
+INSERT INTO `categories` (`id`, `name`, `slug`) VALUES
+(1, 'Biryani', 'biryani'),
+(2, 'Kebabs & Starters', 'kebabs-starters'),
+(3, 'Breads & Sides', 'breads-sides');
 
 -- --------------------------------------------------------
 
@@ -107,6 +128,7 @@ CREATE TABLE `products` (
   `stock` int(11) NOT NULL DEFAULT 0,
   `weight` decimal(10,2) NOT NULL DEFAULT 0.50,
   `gst_rate` decimal(5,2) NOT NULL DEFAULT 5.00,
+  `avg_rating` decimal(3,2) NOT NULL DEFAULT 0.00,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -114,11 +136,32 @@ CREATE TABLE `products` (
 -- Dumping data for table `products`
 --
 
-INSERT INTO `products` (`id`, `name`, `description`, `mrp`, `sale_price`, `image_url`, `stock`, `weight`, `gst_rate`, `created_at`) VALUES
-(1, 'Hyderabadi Chicken Biryani', 'Authentic Hyderabadi style chicken biryani with fragrant basmati rice and succulent chicken pieces.', 300.00, 250.00, 'https://picsum.photos/seed/chicken_biryani/400/300', 100, 0.75, 5.00, '2024-07-23 07:44:59'),
-(2, 'Mutton Dum Biryani', 'Slow-cooked mutton biryani with rich flavors and aromatic spices.', 400.00, 350.00, 'https://picsum.photos/seed/mutton_biryani/400/300', 50, 0.80, 5.00, '2024-07-23 07:44:59'),
-(3, 'Special Vegetable Biryani', 'A medley of fresh vegetables and paneer cooked with basmati rice.', 250.00, 200.00, 'https://picsum.photos/seed/veg_biryani/400/300', 120, 0.70, 5.00, '2024-07-23 07:44:59'),
-(4, 'Tandoori Chicken Kebab', '6 pieces of spicy and succulent chicken kebabs, marinated in yogurt and spices.', 220.00, 180.00, 'https://picsum.photos/seed/chicken_kebab/400/300', 80, 0.40, 12.00, '2024-07-23 07:44:59');
+INSERT INTO `products` (`id`, `name`, `description`, `mrp`, `sale_price`, `image_url`, `stock`, `weight`, `gst_rate`, `avg_rating`, `created_at`) VALUES
+(1, 'Hyderabadi Chicken Biryani', 'Authentic Hyderabadi style chicken biryani with fragrant basmati rice and succulent chicken pieces.', 300.00, 250.00, 'https://picsum.photos/seed/chicken_biryani/400/300', 100, 0.75, 5.00, 4.50, '2024-07-23 07:44:59'),
+(2, 'Mutton Dum Biryani', 'Slow-cooked mutton biryani with rich flavors and aromatic spices.', 400.00, 350.00, 'https://picsum.photos/seed/mutton_biryani/400/300', 50, 0.80, 5.00, 4.80, '2024-07-23 07:44:59'),
+(3, 'Special Vegetable Biryani', 'A medley of fresh vegetables and paneer cooked with basmati rice.', 250.00, 200.00, 'https://picsum.photos/seed/veg_biryani/400/300', 120, 0.70, 5.00, 4.20, '2024-07-23 07:44:59'),
+(4, 'Tandoori Chicken Kebab', '6 pieces of spicy and succulent chicken kebabs, marinated in yogurt and spices.', 220.00, 180.00, 'https://picsum.photos/seed/chicken_kebab/400/300', 80, 0.40, 12.00, 4.60, '2024-07-23 07:44:59');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `product_categories`
+--
+
+CREATE TABLE `product_categories` (
+  `product_id` int(11) NOT NULL,
+  `category_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `product_categories`
+--
+
+INSERT INTO `product_categories` (`product_id`, `category_id`) VALUES
+(1, 1),
+(2, 1),
+(3, 1),
+(4, 2);
 
 -- --------------------------------------------------------
 
@@ -174,6 +217,43 @@ INSERT INTO `product_option_values` (`id`, `option_id`, `value`, `price_adjustme
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `product_tags`
+--
+
+CREATE TABLE `product_tags` (
+  `product_id` int(11) NOT NULL,
+  `tag_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `product_tags`
+--
+
+INSERT INTO `product_tags` (`product_id`, `tag_id`) VALUES
+(1, 1),
+(1, 3),
+(2, 1),
+(3, 2),
+(4, 3);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `reviews`
+--
+
+CREATE TABLE `reviews` (
+  `id` int(11) NOT NULL,
+  `product_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `rating` int(1) NOT NULL,
+  `comment` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `settings`
 --
 
@@ -194,6 +274,27 @@ INSERT INTO `settings` (`setting_key`, `setting_value`) VALUES
 ('delivery_mode', 'fixed'),
 ('gst_rate', '5.00'),
 ('min_order_for_free_delivery', '500.00');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tags`
+--
+
+CREATE TABLE `tags` (
+  `id` int(11) NOT NULL,
+  `name` varchar(50) NOT NULL,
+  `slug` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tags`
+--
+
+INSERT INTO `tags` (`id`, `name`, `slug`) VALUES
+(1, 'Spicy', 'spicy'),
+(2, 'Vegetarian', 'vegetarian'),
+(3, 'Best Seller', 'best-seller');
 
 -- --------------------------------------------------------
 
@@ -238,6 +339,13 @@ ALTER TABLE `cart`
   ADD KEY `product_id` (`product_id`);
 
 --
+-- Indexes for table `categories`
+--
+ALTER TABLE `categories`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `slug` (`slug`);
+
+--
 -- Indexes for table `coupons`
 --
 ALTER TABLE `coupons`
@@ -272,6 +380,13 @@ ALTER TABLE `products`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `product_categories`
+--
+ALTER TABLE `product_categories`
+  ADD PRIMARY KEY (`product_id`,`category_id`),
+  ADD KEY `category_id` (`category_id`);
+
+--
 -- Indexes for table `product_options`
 --
 ALTER TABLE `product_options`
@@ -286,10 +401,32 @@ ALTER TABLE `product_option_values`
   ADD KEY `option_id` (`option_id`);
 
 --
+-- Indexes for table `product_tags`
+--
+ALTER TABLE `product_tags`
+  ADD PRIMARY KEY (`product_id`,`tag_id`),
+  ADD KEY `tag_id` (`tag_id`);
+
+--
+-- Indexes for table `reviews`
+--
+ALTER TABLE `reviews`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `product_id` (`product_id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
 -- Indexes for table `settings`
 --
 ALTER TABLE `settings`
   ADD PRIMARY KEY (`setting_key`);
+
+--
+-- Indexes for table `tags`
+--
+ALTER TABLE `tags`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `slug` (`slug`);
 
 --
 -- Indexes for table `users`
@@ -316,6 +453,12 @@ ALTER TABLE `wishlist`
 --
 ALTER TABLE `cart`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `categories`
+--
+ALTER TABLE `categories`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `coupons`
@@ -354,6 +497,18 @@ ALTER TABLE `product_option_values`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
+-- AUTO_INCREMENT for table `reviews`
+--
+ALTER TABLE `reviews`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `tags`
+--
+ALTER TABLE `tags`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
@@ -389,6 +544,13 @@ ALTER TABLE `order_items`
   ADD CONSTRAINT `order_items_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE;
 
 --
+-- Constraints for table `product_categories`
+--
+ALTER TABLE `product_categories`
+  ADD CONSTRAINT `product_categories_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `product_categories_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE;
+
+--
 -- Constraints for table `product_options`
 --
 ALTER TABLE `product_options`
@@ -399,6 +561,20 @@ ALTER TABLE `product_options`
 --
 ALTER TABLE `product_option_values`
   ADD CONSTRAINT `product_option_values_ibfk_1` FOREIGN KEY (`option_id`) REFERENCES `product_options` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `product_tags`
+--
+ALTER TABLE `product_tags`
+  ADD CONSTRAINT `product_tags_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `product_tags_ibfk_2` FOREIGN KEY (`tag_id`) REFERENCES `tags` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `reviews`
+--
+ALTER TABLE `reviews`
+  ADD CONSTRAINT `reviews_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `reviews_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `wishlist`
