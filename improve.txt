@@ -1,6 +1,6 @@
 # Future Improvements and Production-Ready Features
 
-This document lists suggested features and improvements to make this e-commerce application more robust, user-friendly, and ready for a live production environment. Many foundational features have been built, and this list represents the next logical steps.
+This document lists suggested features and improvements to make this e-commerce application more robust, user-friendly, and ready for a live production environment.
 
 ## 1. Core E-commerce Enhancements
 
@@ -8,14 +8,10 @@ This document lists suggested features and improvements to make this e-commerce 
   - Integrate a real payment gateway like Stripe, Razorpay, or PayPal to handle secure online payments. This is the highest priority for a live store.
 
 - **Advanced Search & Filtering:**
-  - On the search and product listing pages, add advanced filtering options, such as filtering by price range, average rating, or specific tags.
-
-- **Product-Level SEO:**
-  - Add fields for SEO meta titles and descriptions to products, categories, and tags to improve search engine visibility.
+  - Enhance the existing filters with more options, such as filtering by stock status or by multiple categories/tags at once.
 
 - **Sale & Campaign Scheduling:**
-  - Add start and end dates to coupon codes.
-  - Create a system for scheduling sales (e.g., setting a future start/end date for a product's sale price).
+  - Enhance the sale scheduling to allow for more complex rules, like "buy one, get one" offers or time-based flash sales.
 
 ## 2. User Experience and Account Features
 
@@ -26,21 +22,19 @@ This document lists suggested features and improvements to make this e-commerce 
   - Allow users to sign up or log in using social media accounts like Google or Facebook.
 
 - **Order Modification/Cancellation:**
-  - Allow users to request a cancellation for an order that is still in the 'Pending' or 'Processing' state.
+  - Allow users to request a cancellation for an order that is still in the 'Pending' or 'Processing' state directly from their dashboard.
 
 ## 3. Admin and Store Management
 
 - **Advanced Admin Dashboard Analytics:**
   - Implement visual charts (using a library like Chart.js) for the statistics on the admin dashboard to make trends easier to spot.
 
-- **Review Management:**
-  - Create a new section in the admin panel where admins can approve, edit, or delete user-submitted reviews before they appear on the site.
-
 - **Configurable Settings:**
   - Move hardcoded values, such as the low-stock alert threshold (currently 10), into the "Store Settings" page to make them easily configurable by the admin.
 
-- **Pagination:**
-  - Add pagination to all tables in the admin dashboard (Products, Orders, Users) and to the main user-facing product list to improve performance and usability as the store grows.
+- **AJAX-driven Admin Interface:**
+  - Rebuild the admin tables (for sorting, pagination, status updates) to use AJAX. This would provide a much smoother experience for the admin, as the page would not need to reload for every action.
+
 
 ## 4. Technical and Architectural Improvements
 
