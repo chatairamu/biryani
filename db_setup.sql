@@ -81,10 +81,10 @@ CREATE TABLE `order_items` (
 -- Sample data for `products` table (optional)
 --
 INSERT INTO `products` (`name`, `description`, `price`, `image_url`, `stock`) VALUES
-('Chicken Biryani', 'A delicious and aromatic chicken biryani.', 250.00, 'images/chicken_biryani.jpg', 100),
-('Mutton Biryani', 'A rich and flavorful mutton biryani.', 350.00, 'images/mutton_biryani.jpg', 50),
-('Vegetable Biryani', 'A healthy and tasty vegetable biryani.', 200.00, 'images/veg_biryani.jpg', 120),
-('Chicken Kebab', 'Spicy and succulent chicken kebabs.', 180.00, 'images/chicken_kebab.jpg', 80);
+('Chicken Biryani', 'A delicious and aromatic chicken biryani.', 250.00, 'https://picsum.photos/seed/chicken_biryani/400/300', 100),
+('Mutton Biryani', 'A rich and flavorful mutton biryani.', 350.00, 'https://picsum.photos/seed/mutton_biryani/400/300', 50),
+('Vegetable Biryani', 'A healthy and tasty vegetable biryani.', 200.00, 'https://picsum.photos/seed/veg_biryani/400/300', 120),
+('Chicken Kebab', 'Spicy and succulent chicken kebabs.', 180.00, 'https://picsum.photos/seed/chicken_kebab/400/300', 80);
 
 --
 -- Admin User Setup Instructions

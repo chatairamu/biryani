@@ -90,7 +90,7 @@
       <div class="container-fluid">
           <!-- Logo on the left -->
           <a class="navbar-brand" href="index.php">
-              <img src="images/logo.jpg" alt="Logo" width="86" height="67" class="d-inline-block align-text-top">
+              <img src="https://picsum.photos/seed/logo/86/67" alt="Logo" width="86" height="67" class="d-inline-block align-text-top">
           </a>
           <!-- Sidebar Toggle Button on the right -->
           <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
