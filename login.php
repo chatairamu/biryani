@@ -35,12 +35,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $user = $stmt->fetch();
 
             if ($user && password_verify($password, $user['password_hash'])) {
-                // Password is correct, regenerate session ID and CSRF token for security
+                // Password is correct, start session
                 session_regenerate_id(true);
-                unset($_SESSION['csrf_token']); // Unset old token
-
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['role'] = $user['role'];
+
+                // --- CART MERGING LOGIC ---
+                if (isset($_COOKIE['guest_cart'])) {
+                    $guest_cart = json_decode($_COOKIE['guest_cart'], true);
+                    if (is_array($guest_cart)) {
+                        foreach ($guest_cart as $item) {
+                            // For each item in guest cart, add it to user's db cart
+                            // This uses the same logic as add_to_cart.php
+                            $options_json = json_encode($item['options']);
+                            $stmt_check = $pdo->prepare("SELECT id, quantity FROM cart WHERE user_id = ? AND product_id = ? AND options = ?");
+                            $stmt_check->execute([$user['id'], $item['product_id'], $options_json]);
+                            $existing = $stmt_check->fetch();
+
+                            if ($existing) {
+                                $new_qty = $existing['quantity'] + $item['quantity'];
+                                $stmt_update = $pdo->prepare("UPDATE cart SET quantity = ? WHERE id = ?");
+                                $stmt_update->execute([$new_qty, $existing['id']]);
+                            } else {
+                                $stmt_insert = $pdo->prepare("INSERT INTO cart (user_id, product_id, quantity, options) VALUES (?, ?, ?, ?)");
+                                $stmt_insert->execute([$user['id'], $item['product_id'], $item['quantity'], $options_json]);
+                            }
+                        }
+                    }
+                    // Clear the guest cart cookie
+                    setcookie('guest_cart', '', time() - 3600, '/');
+                }
+                // --- END CART MERGING ---
 
                 // Redirect to the appropriate dashboard
                 if ($user['role'] === 'admin') {

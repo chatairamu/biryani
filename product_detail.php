@@ -1,50 +1,40 @@
 <?php
 session_start();
 require_once 'includes/db_connection.php';
-require_once 'includes/helpers.php'; // Include helpers
+require_once 'includes/helpers.php';
 
-// ... (all data fetching logic remains the same) ...
+// ... (all PHP data fetching logic from the correct version) ...
 
-// Handle Review Submission
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_review'])) {
-    validate_csrf_token($_POST['csrf_token']);
-    if ($has_purchased) {
-        // ... (review submission logic remains the same) ...
-    }
-}
-
-// Generate a new CSRF token for the forms on this page
-$csrf_token = generate_csrf_token();
 ?>
 
 <?php include 'includes/header.php'; ?>
 
 <div class="container mt-5 pt-4">
-    <!-- ... (product display logic) ... -->
     <div class="row">
-        <div class="col-md-7">
-            <!-- ... (review display logic) ... -->
+        <div class="col-md-6">
+            <!-- Product Image -->
         </div>
-        <div class="col-md-5">
-            <h3>Write a Review</h3>
-            <?php if(isset($_SESSION['user_id'])): if ($has_purchased): ?>
-                <div class="card">
-                    <div class="card-body">
-                        <form method="POST">
-                            <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
-                            <!-- ... (rest of review form) ... -->
-                            <button type="submit" name="submit_review" class="btn btn-primary">Submit Review</button>
-                        </form>
-                    </div>
-                </div>
-            <?php else: ?>
-                <!-- ... -->
-            <?php endif; else: ?>
-                 <!-- ... -->
-            <?php endif; ?>
+        <div class="col-md-6 product-card" data-product-id="<?php echo $product['id']; ?>">
+            <!-- Product Info, Variants, Pricing -->
+
+            <div class="d-flex">
+                <button class="btn btn-primary btn-lg add-to-cart-btn">Add to Cart</button>
+                <?php if (isset($_SESSION['user_id'])): ?>
+                    <button class="btn btn-outline-danger btn-lg ms-2 add-to-wishlist-btn" title="Add to Wishlist">♥</button>
+                <?php else: ?>
+                    <a href="login.php?redirect=product_detail.php?id=<?php echo $product['id']; ?>" class="btn btn-outline-danger btn-lg ms-2" title="Log in to add to Wishlist">♥</a>
+                <?php endif; ?>
+            </div>
         </div>
     </div>
+
+    <!-- Reviews Section -->
+    <!-- ... -->
+
+    <!-- Related Products Section -->
+    <!-- ... -->
 </div>
 
-<!-- ... (JavaScript) ... -->
+<!-- JavaScript -->
+<!-- ... -->
 <?php include 'includes/footer.php'; ?>
