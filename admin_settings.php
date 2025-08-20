@@ -73,9 +73,14 @@ function get_setting($key, $default = '') {
         </div>
         <div class="card-body">
             <div class="mb-3">
-                <label for="gst_rate" class="form-label">GST / Tax Rate (%)</label>
+                <label for="gst_rate" class="form-label">Default GST / Tax Rate (%)</label>
                 <input type="number" step="0.01" class="form-control" id="gst_rate" name="settings[gst_rate]" value="<?php echo get_setting('gst_rate'); ?>">
-                <small class="form-text text-muted">Enter the tax rate as a percentage, e.g., 5 for 5%.</small>
+                <small class="form-text text-muted">A fallback rate if a product doesn't have a specific GST rate.</small>
+            </div>
+             <div class="mb-3">
+                <label for="packaging_charge_per_item" class="form-label">Packaging Charge Per Item (₹)</label>
+                <input type="number" step="0.01" class="form-control" id="packaging_charge_per_item" name="settings[packaging_charge_per_item]" value="<?php echo get_setting('packaging_charge_per_item'); ?>">
+                <small class="form-text text-muted">A fixed charge added for each unique item in the cart.</small>
             </div>
         </div>
     </div>

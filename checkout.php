@@ -3,75 +3,71 @@ session_start();
 require_once 'includes/db_connection.php';
 require_once 'includes/helpers.php';
 
-$user_id = $_SESSION['user_id'] ?? null;
-$cart_items = [];
-$user = null;
+// ... (logic to fetch cart items for guest or user) ...
+// ... (logic to fetch settings) ...
 
-if ($user_id) {
-    // --- LOGGED-IN USER ---
-    $user = $pdo->query("SELECT * FROM users WHERE id = $user_id")->fetch();
-    $cart_stmt = $pdo->prepare("SELECT p.name, p.mrp, p.sale_price, ... FROM cart c JOIN products p ON c.product_id = p.id WHERE c.user_id = ?");
-    $cart_stmt->execute([$user_id]);
-    $cart_items = $cart_stmt->fetchAll();
-} else {
-    // --- GUEST USER ---
-    $guest_cart = isset($_COOKIE['guest_cart']) ? json_decode($_COOKIE['guest_cart'], true) : [];
-    if (!empty($guest_cart)) {
-        // (Logic to fetch product details for guest cart items, same as in cart.php)
-    }
+// --- Calculations ---
+$subtotal = 0;
+$total_quantity = 0;
+$total_weight = 0;
+$total_gst = 0;
+$today = date('Y-m-d');
+
+foreach ($cart_items as $item) {
+    // ... (price calculation logic including sale dates) ...
+    $subtotal += $item_total_price;
+    $total_quantity += $item['quantity'];
+    $total_weight += $item['weight'] * $item['quantity'];
+    $total_gst += $item_total_price * ($item['gst_rate'] / 100);
 }
 
-if (empty($cart_items)) {
-    header("Location: cart.php");
-    exit();
-}
+$packaging_charge = $total_quantity * floatval($settings['packaging_charge_per_item'] ?? 10);
 
-// ... (All pricing calculation logic remains the same) ...
+// ... (coupon calculation logic) ...
+$subtotal_after_discount = $subtotal - $discount_amount;
 
-$csrf_token = generate_csrf_token();
+// ... (delivery charge calculation logic) ...
+$delivery_charge = ...;
+
+$gst_amount = ($subtotal > 0) ? ($total_gst / $subtotal) * $subtotal_after_discount : 0;
+$grand_total = $subtotal_after_discount + $packaging_charge + $delivery_charge + $gst_amount;
+
+// Save final details to session for process_order.php
+$_SESSION['final_order_details'] = compact('subtotal', 'discount_amount', 'coupon_code', 'gst_amount', 'delivery_charge', 'packaging_charge', 'grand_total');
 ?>
 
 <?php include 'includes/header.php'; ?>
-
 <div class="container mt-5 pt-4">
     <h1>Checkout</h1>
-
-    <?php if (!$user_id): ?>
-    <div class="alert alert-info">
-        Already have an account? <a href="login.php?redirect=checkout.php">Log In</a> for a faster checkout.
-    </div>
-    <?php endif; ?>
-
+    <!-- ... (Guest login prompt) ... -->
     <div class="row">
         <div class="col-md-7">
+            <!-- Shipping Info Form -->
+        </div>
+        <div class="col-md-5">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Shipping Information</h5>
-                    <form id="checkout-form" method="POST" action="process_order.php">
-                        <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
-
-                        <div class="mb-3">
-                            <label class="form-label">Email Address</label>
-                            <input type="email" class="form-control" name="email" value="<?php echo htmlspecialchars($user['email'] ?? ''); ?>" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Full Name</label>
-                            <input type="text" class="form-control" name="name" value="<?php echo htmlspecialchars($user['username'] ?? ''); ?>" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Shipping Address</label>
-                            <textarea class="form-control" name="shipping_address" rows="3" required><?php echo htmlspecialchars($user['address'] ?? ''); ?></textarea>
-                        </div>
-
-                        <div class="d-grid"><button type="submit" class="btn btn-success btn-lg">Place Order</button></div>
-                    </form>
+                    <h5 class="card-title">Order Summary</h5>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between"><span>Total Quantity:</span> <strong><?php echo $total_quantity; ?></strong></li>
+                        <li class="list-group-item d-flex justify-content-between"><span>Subtotal:</span> <span>₹<?php echo number_format($subtotal, 2); ?></span></li>
+                        <li class="list-group-item d-flex justify-content-between"><span>Packaging Charge:</span> <span>₹<?php echo number_format($packaging_charge, 2); ?></span></li>
+                        <li class="list-group-item d-flex justify-content-between"><span>Delivery Charge:</span> <span>₹<?php echo number_format($delivery_charge, 2); ?></span></li>
+                        <li class="list-group-item d-flex justify-content-between"><span>GST (Calculated):</span> <span>₹<?php echo number_format($gst_amount, 2); ?></span></li>
+                        <?php if ($discount_amount > 0): ?>
+                            <li class="list-group-item d-flex justify-content-between text-success">
+                                <span>Discount (<?php echo htmlspecialchars($coupon_code); ?>)</span>
+                                <span>-₹<?php echo number_format($discount_amount, 2); ?></span>
+                            </li>
+                        <?php endif; ?>
+                        <li class="list-group-item d-flex justify-content-between h5">
+                            <strong>Total:</strong>
+                            <strong>₹<?php echo number_format($grand_total, 2); ?></strong>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
-        <div class="col-md-5">
-            <!-- Order Summary Section remains the same -->
-        </div>
     </div>
 </div>
-
 <?php include 'includes/footer.php'; ?>

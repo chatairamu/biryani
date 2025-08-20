@@ -54,10 +54,20 @@ try {
 
     // --- Create Order (user_id can be NULL for guests) ---
     $order_stmt = $pdo->prepare(
-        "INSERT INTO orders (user_id, total_amount, shipping_address, gst_amount, delivery_charge, coupon_code, discount_amount, status)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+        "INSERT INTO orders (user_id, total_amount, shipping_address, gst_amount, delivery_charge, packaging_charge, coupon_code, discount_amount, status)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
     );
-    $order_stmt->execute([$user_id, $order_details['grand_total'], $shipping_address, $order_details['gst_amount'], $order_details['delivery_charge'], $order_details['coupon_code'], 'Pending']);
+    $order_stmt->execute([
+        $user_id,
+        $order_details['grand_total'],
+        $shipping_address,
+        $order_details['gst_amount'],
+        $order_details['delivery_charge'],
+        $order_details['packaging_charge'],
+        $order_details['coupon_code'],
+        $order_details['discount_amount'],
+        'Pending'
+    ]);
     $order_id = $pdo->lastInsertId();
 
     // --- Move items to order_items and update stock ---

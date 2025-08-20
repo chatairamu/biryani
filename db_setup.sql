@@ -75,6 +75,7 @@ CREATE TABLE `orders` (
   `shipping_address` text DEFAULT NULL,
   `gst_amount` decimal(10,2) DEFAULT 0.00,
   `delivery_charge` decimal(10,2) DEFAULT 0.00,
+  `packaging_charge` decimal(10,2) DEFAULT 0.00,
   `coupon_code` varchar(50) DEFAULT NULL,
   `discount_amount` decimal(10,2) DEFAULT 0.00
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
