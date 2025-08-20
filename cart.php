@@ -2,32 +2,42 @@
 session_start();
 require_once 'includes/db_connection.php';
 require_once 'includes/helpers.php';
+require_once 'includes/cart_functions.php'; // I will create this file
 
-// ... (logic to fetch cart_items for guest or user) ...
+$user_id = $_SESSION['user_id'] ?? null;
+$cart_items = get_cart_items($conn, $user_id);
 
 // --- Fetch Settings ---
-$settings = $pdo->query("SELECT setting_key, setting_value FROM settings")->fetchAll(PDO::FETCH_KEY_PAIR);
-$packaging_charge_per_item = floatval($settings['packaging_charge_per_item'] ?? 10);
-// Note: We use a global GST rate here for simplicity in the cart view.
-// The final per-product GST is calculated at checkout.
+$settings_stmt = $conn->query("SELECT setting_key, setting_value FROM settings");
+$settings = $settings_stmt->fetch_all(MYSQLI_ASSOC);
+$settings = array_column($settings, 'setting_value', 'setting_key');
+
 $gst_rate = floatval($settings['gst_rate'] ?? 5);
 
 // --- Calculate Totals ---
 $subtotal = 0;
 $total_quantity = 0;
+$total_packaging_charge = 0;
 $checkout_disabled = false;
 
 foreach ($cart_items as &$item) {
-    // ... (price calculation logic) ...
+    $price_info = calculate_product_price($item, $item['options'] ?? []);
+    $item['current_price'] = $price_info['price'];
+    $item['on_sale'] = $price_info['on_sale'];
+    $item['total_price'] = $item['current_price'] * $item['quantity'];
+
     $subtotal += $item['total_price'];
     $total_quantity += $item['quantity'];
+    $total_packaging_charge += ($item['extra_packaging_charge'] ?? 0) * $item['quantity'];
+
     if ($item['quantity'] > $item['stock']) {
         $checkout_disabled = true;
+        $item['stock_issue'] = true;
     }
 }
 unset($item);
 
-$packaging_charge = $total_quantity * $packaging_charge_per_item;
+$packaging_charge = $total_packaging_charge;
 
 // ... (coupon calculation logic) ...
 
