@@ -26,7 +26,7 @@ $low_stock_products = $low_stock_stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
 ?>
 
-<?php include 'includes/header.php'; ?>
+<?php include_once 'includes/header.php'; ?>
 
 <div class="container-fluid my-4">
     <h1>Admin Dashboard</h1>
@@ -111,7 +111,8 @@ $low_stock_products = $low_stock_stmt->get_result()->fetch_all(MYSQLI_ASSOC);
             <div class="col-md-4 mb-3"><label for="product-gst-rate">GST Rate (%)</label><input type="text" class="form-control" id="product-gst-rate" name="gst_rate"></div>
             <div class="col-md-4 mb-3"><label for="product-extra-packaging-charge">Packaging Charge</label><input type="text" class="form-control" id="product-extra-packaging-charge" name="extra_packaging_charge"></div>
           </div>
-          <div class="mb-3"><label for="product-image-url">Image URL</label><input type="text" class="form-control" id="product-image-url" name="image_url"></div>
+          <div class="mb-3"><label for="product-thumbnail-url">Thumbnail URL</label><input type="text" class="form-control" id="product-thumbnail-url" name="thumbnail_url" placeholder="URL for the main list view image"></div>
+          <div class="mb-3"><label for="product-gallery-images">Gallery Images (one URL per line)</label><textarea class="form-control" id="product-gallery-images" name="gallery_images" rows="4"></textarea></div>
         </form>
       </div>
       <div class="modal-footer">
@@ -288,7 +289,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('product-weight').value = product.weight;
                 document.getElementById('product-gst-rate').value = product.gst_rate;
                 document.getElementById('product-extra-packaging-charge').value = product.extra_packaging_charge;
-                document.getElementById('product-image-url').value = product.image_url;
+                document.getElementById('product-thumbnail-url').value = product.thumbnail_url;
+                document.getElementById('product-gallery-images').value = (product.gallery_images || []).join('\\n');
 
                 productModal.show();
             } catch (error) {
@@ -330,4 +332,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-<?php include 'includes/footer.php'; ?>
+<?php include_once 'includes/footer.php'; ?>

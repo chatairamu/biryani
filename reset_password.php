@@ -69,7 +69,7 @@ if ($token_is_valid && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
 ?>
 
-<?php include 'includes/header.php'; ?>
+<?php include_once 'includes/header.php'; ?>
 
 <div class="container mt-5 pt-4">
     <div class="row justify-content-center">
@@ -106,4 +106,4 @@ if ($token_is_valid && $_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 </div>
 
-<?php include 'includes/footer.php'; ?>
+<?php include_once 'includes/footer.php'; ?>

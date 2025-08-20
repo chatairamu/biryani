@@ -45,7 +45,7 @@ function get_setting($key, $default = '') {
 
 ?>
 
-<?php include 'includes/header.php'; ?>
+<?php include_once 'includes/header.php'; ?>
 
 <h1>Store Settings</h1>
 <p>Manage global settings for your e-commerce store.</p>
@@ -128,4 +128,4 @@ function get_setting($key, $default = '') {
 </form>
 
 
-<?php include 'includes/footer.php'; ?>
+<?php include_once 'includes/footer.php'; ?>

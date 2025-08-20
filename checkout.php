@@ -48,7 +48,7 @@ $_SESSION['final_order_details'] = compact('subtotal', 'discount_amount', 'coupo
 $csrf_token = generate_csrf_token();
 ?>
 
-<?php include 'includes/header.php'; ?>
+<?php include_once 'includes/header.php'; ?>
 <div class="container my-5">
     <h1>Checkout</h1>
 
@@ -134,4 +134,4 @@ $csrf_token = generate_csrf_token();
         </div>
     </div>
 </div>
-<?php include 'includes/footer.php'; ?>
+<?php include_once 'includes/footer.php'; ?>

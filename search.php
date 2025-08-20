@@ -32,7 +32,7 @@ if (isset($_GET['query'])) {
 }
 ?>
 
-<?php include 'includes/header.php'; ?>
+<?php include_once 'includes/header.php'; ?>
 
 <div class="container mt-5 pt-4">
     <h1>Search Products</h1>
@@ -74,4 +74,4 @@ if (isset($_GET['query'])) {
 
 </div>
 
-<?php include 'includes/footer.php'; ?>
+<?php include_once 'includes/footer.php'; ?>

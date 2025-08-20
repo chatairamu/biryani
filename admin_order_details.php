@@ -40,7 +40,7 @@ $items_stmt->execute([$order_id]);
 $order_items = $items_stmt->fetchAll();
 ?>
 
-<?php include 'includes/header.php'; ?>
+<?php include_once 'includes/header.php'; ?>
 
 <div class="container mt-5 pt-4">
     <a href="admin_dashboard.php#orders" class="btn btn-secondary mb-3">← Back to Orders</a>
@@ -119,4 +119,4 @@ $order_items = $items_stmt->fetchAll();
     </div>
 </div>
 
-<?php include 'includes/footer.php'; ?>
+<?php include_once 'includes/footer.php'; ?>

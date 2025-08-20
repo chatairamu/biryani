@@ -108,7 +108,7 @@ foreach ($results as $row) {
 
 ?>
 
-<?php include 'includes/header.php'; ?>
+<?php include_once 'includes/header.php'; ?>
 
 <h1>Manage Variants for: <?php echo htmlspecialchars($product['name']); ?></h1>
 <p>Add options like 'Size' or 'Spice Level', then add corresponding values like 'Large' or 'Spicy' with price adjustments.</p>
@@ -194,4 +194,4 @@ foreach ($results as $row) {
     </div>
 </div>
 
-<?php include 'includes/footer.php'; ?>
+<?php include_once 'includes/footer.php'; ?>

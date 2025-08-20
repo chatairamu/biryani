@@ -3,7 +3,7 @@ session_start();
 require_once 'includes/db_connection.php';
 
 // Fetch products for the sliders
-$latest_products_stmt = $pdo->query("SELECT name, sale_price as price, image_url as img FROM products ORDER BY created_at DESC LIMIT 8");
+$latest_products_stmt = $pdo->query("SELECT id, name, sale_price as price, image_url as img FROM products ORDER BY created_at DESC LIMIT 8");
 $latest_products = $latest_products_stmt->fetchAll();
 
 // We'll use the same data for all sliders for this example
@@ -88,7 +88,7 @@ $featured_categories = [
 </head>
 <body>
 
-  <?php include 'includes/header.php'; ?>
+  <?php include_once 'includes/header.php'; ?>
 
   <!-- Main Content -->
   <div class="container mt-5 pt-4">
@@ -157,7 +157,7 @@ $featured_categories = [
     </section>
   </div>
 
-  <?php include 'includes/footer.php'; ?>
+  <?php include_once 'includes/footer.php'; ?>
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -172,10 +172,17 @@ $featured_categories = [
         if (!slider || products.length === 0) return;
         products.forEach(product => {
           const div = document.createElement("div");
+          // Add the product-card class and data attribute here
+          div.classList.add('product-card');
+          div.dataset.productId = product.id;
+
           div.innerHTML = `
-            <img src="${product.img}" alt="${product.name}">
-            <h6>${product.name}</h6>
-            <p>₹${parseFloat(product.price).toFixed(2)}</p>
+            <a href="product_detail.php?id=${product.id}" class="text-decoration-none text-dark">
+              <img src="${product.img}" alt="${product.name}">
+              <h6>${product.name}</h6>
+              <p>₹${parseFloat(product.price).toFixed(2)}</p>
+            </a>
+            <button class="btn btn-sm btn-success ajax-add-to-cart">Add to Cart</button>
           `;
           slider.appendChild(div);
         });

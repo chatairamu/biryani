@@ -71,7 +71,7 @@ $addresses = get_user_addresses($pdo, $user_id);
 $csrf_token = generate_csrf_token();
 ?>
 
-<?php include 'includes/header.php'; ?>
+<?php include_once 'includes/header.php'; ?>
 
 <div class="container my-5">
     <h1>User Dashboard</h1>
@@ -234,4 +234,4 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 
-<?php include 'includes/footer.php'; ?>
+<?php include_once 'includes/footer.php'; ?>

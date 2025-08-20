@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
-$product_id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
+$product_id = filter_input(INPUT_POST, 'product_id', FILTER_VALIDATE_INT);
 $quantity_change = filter_input(INPUT_POST, 'quantity', FILTER_VALIDATE_INT, ['options' => ['default' => 1]]);
 $options_json = isset($_POST['options']) ? $_POST['options'] : '{}';
 $options_array = json_decode($options_json, true);

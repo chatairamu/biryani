@@ -65,7 +65,7 @@ if (isset($_GET['edit_id'])) {
 $csrf_token = generate_csrf_token();
 ?>
 
-<?php include 'includes/header.php'; ?>
+<?php include_once 'includes/header.php'; ?>
 
 <h1>Manage Categories</h1>
 <a href="admin_dashboard.php" class="btn btn-secondary mb-3">← Back to Dashboard</a>
@@ -119,4 +119,4 @@ $csrf_token = generate_csrf_token();
     </div>
 </div>
 
-<?php include 'includes/footer.php'; ?>
+<?php include_once 'includes/footer.php'; ?>

@@ -50,7 +50,7 @@ $delivery_charge = floatval($settings['delivery_charge_fixed'] ?? 50);
 $grand_total = $subtotal_after_discount + $packaging_charge + $delivery_charge + $gst_amount;
 
 ?>
-<?php include 'includes/header.php'; ?>
+<?php include_once 'includes/header.php'; ?>
 
 <div class="container mt-5 pt-4">
     <h1>Your Cart</h1>
@@ -95,4 +95,4 @@ $grand_total = $subtotal_after_discount + $packaging_charge + $delivery_charge +
     </div>
 </div>
 
-<?php include 'includes/footer.php'; ?>
+<?php include_once 'includes/footer.php'; ?>

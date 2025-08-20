@@ -87,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $csrf_token = generate_csrf_token();
 ?>
 
-<?php include 'includes/header.php'; ?>
+<?php include_once 'includes/header.php'; ?>
 
 <h1>Login</h1>
 
@@ -115,4 +115,4 @@ $csrf_token = generate_csrf_token();
     <p>Don't have an account? <a href="signup.php">Signup here</a>.</p>
 </div>
 
-<?php include 'includes/footer.php'; ?>
+<?php include_once 'includes/footer.php'; ?>
